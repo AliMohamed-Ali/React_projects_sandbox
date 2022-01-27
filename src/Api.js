@@ -3,7 +3,16 @@ import axios from "axios";
 
 const Api = () => {
   const [term, setTerm] = useState("javascript");
+  const [debounce, setDebounce] = useState(term);
   const [result, setResult] = useState([]);
+  useEffect(() => {
+    const timeOut = setTimeout(() => {
+      setDebounce(term);
+    }, 1200);
+    return () => {
+      clearTimeout(timeOut);
+    };
+  }, [term]);
   useEffect(() => {
     const search = async () => {
       const respond = await axios.get("https://en.wikipedia.org/w/api.php", {
@@ -12,16 +21,40 @@ const Api = () => {
           list: "search",
           origin: "*",
           format: "json",
-          srsearch: term
+          srsearch: debounce
         }
       });
       setResult(respond.data.query.search);
     };
-    if (term) {
-      search();
-    }
-  }, [term]);
-  console.log(result);
+    search();
+  }, [debounce]);
+  // useEffect(() => {
+  //   const search = async () => {
+  //     const respond = await axios.get("https://en.wikipedia.org/w/api.php", {
+  //       params: {
+  //         action: "query",
+  //         list: "search",
+  //         origin: "*",
+  //         format: "json",
+  //         srsearch: term
+  //       }
+  //     });
+  //     setResult(respond.data.query.search);
+  //   };
+  //   if(!result.length){
+  //     if (term) {
+  //       search();
+  //     };
+  //   }else{
+  //      const time = setTimeout(() => {
+  //       if (term) {
+  //         search();
+  //       }
+  //     }, 1000);
+  //     return () => {clearTimeout(time)};
+  //   }
+  // }, [term,result.length]);
+  // console.log(result);
 
   return (
     <div className="container">
